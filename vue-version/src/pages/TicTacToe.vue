@@ -14,15 +14,13 @@ const WINNER_ROWS = [
   [2, 4, 6]
 ];
 
-const history = ref([Array(9).fill(null)]);
-const stepsHistory = ref([]);
-
+const history = ref([{ squares: Array(9).fill(null), pos: null, value: null }]);
 const currentStep = ref(0);
 
 const currentEmoji = computed(() =>
   currentStep.value % 2 === 0 ? '❌' : '⭕'
 );
-const lastMove = computed(() => history.value[currentStep.value]);
+const lastMove = computed(() => history.value[currentStep.value].squares);
 const winner = computed(() => {
   for (let i = 0; i < WINNER_ROWS.length; i++) {
     const [a, b, c] = WINNER_ROWS[i];
@@ -46,14 +44,12 @@ function handlePlay(index) {
   if (lastMove.value[index] || winner.value) return;
 
   const newStep = { pos: SQUARES_POSITION[index], value: currentEmoji.value };
-  const newStepsHistory = stepsHistory.value.slice(0, currentStep.value);
-  stepsHistory.value = [...newStepsHistory, newStep];
 
   const newSquares = [...lastMove.value];
   newSquares[index] = currentEmoji.value;
 
   const newHistory = history.value.slice(0, currentStep.value + 1);
-  history.value = [...newHistory, newSquares];
+  history.value = [...newHistory, { squares: newSquares, ...newStep }];
 
   currentStep.value = history.value.length - 1;
 }
@@ -74,20 +70,22 @@ function rollback(payload) {
     />
     <div class="mt-5">Rollback:</div>
     <ol class="mt-1 flex justify-center">
-      <li
-        class="cursor-pointer rounded bg-red-100 px-3 py-1 text-gray-700 hover:bg-red-200"
-        @click="rollback(0)"
-      >
-        Restart
-      </li>
-      <li
-        v-for="(step, index) in stepsHistory"
-        :key="`step-${index}`"
-        class="ml-2 cursor-pointer rounded bg-lime-100 px-3 py-1 text-gray-700 hover:bg-lime-200"
-        @click="rollback(index + 1)"
-      >
-        {{ index + 1 }}: {{ step.pos }} {{ step.value }}
-      </li>
+      <template v-for="(item, index) in history" :key="`step-${index}`">
+        <li
+          v-if="index === 0"
+          class="cursor-pointer rounded bg-red-100 px-3 py-1 text-gray-700 hover:bg-red-200"
+          @click="rollback(0)"
+        >
+          Restart
+        </li>
+        <li
+          v-else
+          class="ml-2 cursor-pointer rounded bg-lime-100 px-3 py-1 text-gray-700 hover:bg-lime-200"
+          @click="rollback(index)"
+        >
+          {{ index }}: {{ item.pos }} {{ item.value }}
+        </li>
+      </template>
     </ol>
   </div>
 </template>
