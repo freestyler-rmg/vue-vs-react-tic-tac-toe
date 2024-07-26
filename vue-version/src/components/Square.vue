@@ -1,7 +1,8 @@
 <script setup lang="ts">
 const props = defineProps({
   value: String,
-  position: String
+  position: String,
+  winner: Boolean
 });
 
 const emit = defineEmits(['onClick']);
@@ -13,7 +14,8 @@ function onClick() {
 
 <template>
   <div
-    class="square-el border-1 relative flex h-8 w-8 flex-none cursor-pointer items-center justify-center border border-black align-top text-lg leading-none hover:bg-lime-100"
+    class="square-el border-1 relative flex h-8 w-8 flex-none cursor-pointer items-center justify-center border border-black align-top text-lg leading-none hover:bg-gray-100"
+    :class="{ 'bg-lime-200': winner }"
     @click="onClick"
   >
     {{ value }}

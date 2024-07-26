@@ -16,6 +16,7 @@ const WINNER_ROWS = [
 
 const history = ref([{ squares: Array(9).fill(null), pos: null, value: null }]);
 const currentStep = ref(0);
+const winnerSquares = ref([]);
 
 const currentEmoji = computed(() =>
   currentStep.value % 2 === 0 ? '❌' : '⭕'
@@ -29,6 +30,7 @@ const winner = computed(() => {
       lastMove.value[a] === lastMove.value[b] &&
       lastMove.value[a] === lastMove.value[c]
     ) {
+      winnerSquares.value = [a, b, c];
       return lastMove.value[a];
     }
   }
@@ -55,6 +57,7 @@ function handlePlay(index) {
 }
 
 function rollback(payload) {
+  winnerSquares.value = [];
   currentStep.value = payload;
 }
 </script>
@@ -66,6 +69,7 @@ function rollback(payload) {
       :squares="lastMove"
       :value="currentEmoji"
       :squares-position="SQUARES_POSITION"
+      :winner-squares="winnerSquares"
       @on-play="handlePlay"
     />
     <div class="mt-5">Rollback:</div>
@@ -81,6 +85,7 @@ function rollback(payload) {
         <li
           v-else
           class="ml-2 cursor-pointer rounded bg-lime-100 px-3 py-1 text-gray-700 hover:bg-lime-200"
+          :class="{ 'bg-lime-200': index === currentStep }"
           @click="rollback(index)"
         >
           {{ index }}: {{ item.pos }} {{ item.value }}

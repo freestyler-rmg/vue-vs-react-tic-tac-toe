@@ -4,13 +4,18 @@ import Square from './Square.vue';
 
 const props = defineProps({
   squares: Array,
-  squaresPosition: Array
+  squaresPosition: Array,
+  winnerSquares: Array
 });
 
 const emit = defineEmits(['onPlay']);
 
 function handleClick(payload) {
   emit('onPlay', payload);
+}
+
+function isWinner(index) {
+  return props.winnerSquares?.indexOf(index) !== -1;
 }
 </script>
 
@@ -20,6 +25,7 @@ function handleClick(payload) {
       <Square
         :value="value"
         :position="squaresPosition[index]"
+        :winner="isWinner(index)"
         @on-click="handleClick(index)"
       />
     </template>
