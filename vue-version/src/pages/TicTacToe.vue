@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
+
 import Board from '../components/Board.vue';
 
 const SQUARES_POSITION = ['A1', 'A2', 'A3', 'B1', 'B2', 'B3', 'C1', 'C2', 'C3'];
@@ -14,15 +15,25 @@ const WINNER_ROWS = [
   [2, 4, 6]
 ];
 
-const history = ref([{ squares: Array(9).fill(null), pos: null, value: null }]);
-const currentStep = ref(0);
-const winnerSquares = ref([]);
+interface HistoryItemType {
+  squares: (string | null)[];
+  pos: string | null;
+  value: string | null;
+}
+
+const history = ref<HistoryItemType[]>([
+  { squares: Array(9).fill(null), pos: null, value: null }
+]);
+const currentStep = ref<number>(0);
+const winnerSquares = ref<number[]>([]);
 
 const currentEmoji = computed(() =>
   currentStep.value % 2 === 0 ? '❌' : '⭕'
 );
-const lastMove = computed(() => history.value[currentStep.value].squares);
-const winner = computed(() => {
+const lastMove = computed<string[] | null[]>(
+  () => history.value[currentStep.value].squares
+);
+const winner = computed<string | null>(() => {
   for (let i = 0; i < WINNER_ROWS.length; i++) {
     const [a, b, c] = WINNER_ROWS[i];
     if (
@@ -36,29 +47,32 @@ const winner = computed(() => {
   }
   return null;
 });
-const message = computed(() => {
+const message = computed<string>(() => {
   return winner.value
     ? `A winner is you! ${winner.value}`
     : `Current turn: ${currentEmoji.value}`;
 });
 
-function handlePlay(index) {
+function handlePlay(index: number) {
   if (lastMove.value[index] || winner.value) return;
 
-  const newStep = { pos: SQUARES_POSITION[index], value: currentEmoji.value };
+  const newStep: { pos: string; value: string } = {
+    pos: SQUARES_POSITION[index],
+    value: currentEmoji.value
+  };
 
   const newSquares = [...lastMove.value];
   newSquares[index] = currentEmoji.value;
 
-  const newHistory = history.value.slice(0, currentStep.value + 1);
-  history.value = [...newHistory, { squares: newSquares, ...newStep }];
+  const tempHistory = history.value.slice(0, currentStep.value + 1);
+  history.value = [...tempHistory, { squares: newSquares, ...newStep }];
 
   currentStep.value = history.value.length - 1;
 }
 
-function rollback(payload) {
+function rollback(index: number) {
   winnerSquares.value = [];
-  currentStep.value = payload;
+  currentStep.value = index;
 }
 </script>
 

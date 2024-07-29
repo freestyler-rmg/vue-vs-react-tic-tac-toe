@@ -1,20 +1,24 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
 import Square from './Square.vue';
 
-const props = defineProps({
-  squares: Array,
-  squaresPosition: Array,
-  winnerSquares: Array
-});
+interface Props {
+  squares: (string | null)[];
+  squaresPosition: string[];
+  winnerSquares: number[];
+}
 
-const emit = defineEmits(['onPlay']);
+const props = defineProps<Props>();
 
-function handleClick(payload) {
+// const emit = defineEmits(['onPlay']);
+const emit = defineEmits<{
+  onPlay: [payload: number];
+}>();
+
+function handleClick(payload: number) {
   emit('onPlay', payload);
 }
 
-function isWinner(index) {
+function isWinner(index: number) {
   return props.winnerSquares?.indexOf(index) !== -1;
 }
 </script>

@@ -1,8 +1,12 @@
 <script setup lang="ts">
-const props = defineProps({
-  value: String,
-  position: String,
-  winner: Boolean
+interface Props {
+  value: string;
+  position?: string;
+  winner?: boolean;
+}
+
+withDefaults(defineProps<Props>(), {
+  position: 'XX'
 });
 
 const emit = defineEmits(['onClick']);
